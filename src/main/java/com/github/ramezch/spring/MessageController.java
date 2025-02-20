@@ -15,13 +15,13 @@ public class MessageController {
         return messages;
     }
 
-    @PostMapping("")
+    @PostMapping("/add")
     public Message createMessage(@RequestBody Message newMessage) {
         messages.put(newMessage.getId(), newMessage);
         return newMessage;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteMessage(@PathVariable String id) {
         if (messages.containsKey(id)) {
             messages.remove(id);
