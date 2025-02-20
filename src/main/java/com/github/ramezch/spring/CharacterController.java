@@ -8,11 +8,11 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/asterix/")
+@RequestMapping("/api/asterix/characters/")
 public class CharacterController {
     private final CharacterRepository characterRepo;
 
-    @GetMapping("characters")
+    @GetMapping("")
     public List<Character> getCharacters(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer age,
@@ -30,12 +30,12 @@ public class CharacterController {
         return characterRepo.findAll();
     }
 
-    @PostMapping("characters")
+    @PostMapping("")
     public Character createCharacter(@RequestBody Character character) {
         return characterRepo.save(character);
     }
 
-    @PutMapping("characters/{id}")
+    @PutMapping("{id}")
     public Character updateCharacter(@PathVariable String id, @RequestBody Character newCharacterData) {
         Optional<Character> characterOptional = characterRepo.findById(id);
         if (characterOptional.isPresent()) {
@@ -46,11 +46,20 @@ public class CharacterController {
         return null;
     }
 
-    @DeleteMapping("characters/{id}")
+    @DeleteMapping("{id}")
     public void deleteCharacter(@PathVariable String id) {
         if (characterRepo.existsById(id)) {
             characterRepo.deleteById(id);
             System.out.println("Character with id: " + id + " has been deleted.");
         }
+    }
+
+    @GetMapping("average-age")
+    public double getAverageAge() {
+        List<Character> characters = characterRepo.findAll();
+        return characters.stream()
+                .mapToInt(Character::age)
+                .average()
+                .orElse(0.0);
     }
 }
