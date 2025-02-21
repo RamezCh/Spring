@@ -1,4 +1,4 @@
-package com.github.ramezch.spring;
+package com.github.ramezch.spring.characters;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

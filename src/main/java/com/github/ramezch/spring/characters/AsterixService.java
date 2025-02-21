@@ -1,9 +1,10 @@
-package com.github.ramezch.spring;
+package com.github.ramezch.spring.characters;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -18,6 +19,10 @@ public class AsterixService {
         if (maxAge != null) return characterRepo.findByAgeLessThanEqual(maxAge);
 
         return characterRepo.findAll();
+    }
+
+    public Optional<Character> getCharacterById(String id) {
+        return characterRepo.findById(id);
     }
 
     public Character createCharacter(CharacterDTO character) {
