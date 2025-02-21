@@ -33,7 +33,7 @@ class AsterixServiceTest {
     }
 
     @Test
-    void getCharacters_WhenNotEmpty_ShouldReturnAllCharacters() {
+    void getCharacters_ReturnsAllCharacters_WhenRepositoryIsNotEmpty() {
         // GIVEN
         when(mockCharacterRepo.findAll()).thenReturn(List.of(testChar, me));
 
@@ -42,12 +42,11 @@ class AsterixServiceTest {
 
         // THEN
         verify(mockCharacterRepo).findAll();
-        List<Character> expected = List.of(testChar, me);
-        assertEquals(expected, actual);
+        assertIterableEquals(List.of(testChar, me), actual);
     }
 
     @Test
-    void getCharacters_WhenEmpty_ShouldReturnEmptyList() {
+    void getCharacters_ReturnsEmptyList_WhenRepositoryIsEmpty() {
         // GIVEN
         when(mockCharacterRepo.findAll()).thenReturn(List.of());
 
@@ -60,7 +59,7 @@ class AsterixServiceTest {
     }
 
     @Test
-    void updateCharacter_WhenCharacterExists_ShouldReturnUpdatedCharacter() {
+    void updateCharacter_ReturnsUpdatedCharacter_WhenCharacterExists() {
         // GIVEN
         CharacterDTO testCharDTO = new CharacterDTO("Ramez", 25, "Software Engineer");
         Character updatedCharacter = new Character("1", "Ramez", 25, "Software Engineer");
@@ -78,22 +77,46 @@ class AsterixServiceTest {
     }
 
     @Test
-    void deleteCharacter_ShouldCallRepositoryDeleteById() {
-        //GIVEN
+    void updateCharacter_ThrowsException_WhenCharacterNotFound() {
+        // GIVEN
+        CharacterDTO testCharDTO = new CharacterDTO("Ramez", 25, "Software Engineer");
+        when(mockCharacterRepo.findById("1")).thenReturn(Optional.empty());
+
+        // WHEN & THEN
+        assertThrows(RuntimeException.class, () -> characterService.updateCharacter("1", testCharDTO));
+        verify(mockCharacterRepo).findById("1");
+        verify(mockCharacterRepo, never()).save(any());
+    }
+
+    @Test
+    void deleteCharacter_DeletesCharacter_WhenCharacterExists() {
+        // GIVEN
         String id = "1";
         when(mockCharacterRepo.existsById(id)).thenReturn(true);
         doNothing().when(mockCharacterRepo).deleteById(id);
 
-        //WHEN
+        // WHEN
         characterService.deleteCharacter(id);
 
-        //THEN
+        // THEN
         verify(mockCharacterRepo).existsById(id);
         verify(mockCharacterRepo).deleteById(id);
     }
 
     @Test
-    void getCharacterById_WhenCharacterExists_ShouldReturnCharacter() {
+    void deleteCharacter_ThrowsException_WhenCharacterNotFound() {
+        // GIVEN
+        String id = "1";
+        when(mockCharacterRepo.existsById(id)).thenReturn(false);
+
+        // WHEN & THEN
+        assertThrows(RuntimeException.class, () -> characterService.deleteCharacter(id));
+        verify(mockCharacterRepo).existsById(id);
+        verify(mockCharacterRepo, never()).deleteById(id);
+    }
+
+    @Test
+    void getCharacterById_ReturnsCharacter_WhenCharacterExists() {
         // GIVEN
         when(mockCharacterRepo.findById("1")).thenReturn(Optional.of(testChar));
 
@@ -106,7 +129,7 @@ class AsterixServiceTest {
     }
 
     @Test
-    void getCharacterById_WhenCharacterNotFound_ShouldReturnEmptyOptional() {
+    void getCharacterById_ReturnsEmptyOptional_WhenCharacterNotFound() {
         // GIVEN
         when(mockCharacterRepo.findById("1")).thenReturn(Optional.empty());
 
